@@ -1,36 +1,40 @@
 {
-  "Config.FurnitureAdjustmentContinued.EnableMod.Name": "Enable Mod",
-  "Config.FurnitureAdjustmentContinued.EnableMod.Description": "Enables the mod",
+  "Config.PreciseFurniture.EnableMod.Name": "Enable Mod",
+  "Config.PreciseFurniture.EnableMod.Description": "Enables the mod",
 
-  "Config.FurnitureAdjustmentContinued.MoveCursor.Name": "Move Cursor with Furniture",
-  "Config.FurnitureAdjustmentContinued.MoveCursor.Description": "When moving furniture, the cursor moves with it",
+  "Config.PreciseFurniture.MoveCursor.Name": "Move Cursor with Furniture",
+  "Config.PreciseFurniture.MoveCursor.Description": "When moving furniture, the cursor moves with it",
 
-  "Config.FurnitureAdjustmentContinued.RaiseButton.Name": "Raise Button",
-  "Config.FurnitureAdjustmentContinued.RaiseButton.Description": "Keybind for raising furniture",
+  "Config.PreciseFurniture.BlacklistPreventsPickup.Name": "Locking Prevents Pickup",
+  "Config.PreciseFurniture.BlacklistPreventsPickup.Description": "Prevents picking up locked furniture",
 
-  "Config.FurnitureAdjustmentContinued.LowerButton.Name": "Lower Button",
-  "Config.FurnitureAdjustmentContinued.LowerButton.Description": "Keybind for lowering furniture",
+  "Config.PreciseFurniture.RaiseButton.Name": "Raise Button",
+  "Config.PreciseFurniture.RaiseButton.Description": "Keybind for raising furniture",
 
-  "Config.FurnitureAdjustmentContinued.LeftButton.Name": "Left Button",
-  "Config.FurnitureAdjustmentContinued.LeftButton.Description": "Keybind for moving furniture left",
+  "Config.PreciseFurniture.LowerButton.Name": "Lower Button",
+  "Config.PreciseFurniture.LowerButton.Description": "Keybind for lowering furniture",
 
-  "Config.FurnitureAdjustmentContinued.RightButton.Name": "Right Button",
-  "Config.FurnitureAdjustmentContinued.RightButton.Description": "Keybind for moving furniture right",
+  "Config.PreciseFurniture.LeftButton.Name": "Left Button",
+  "Config.PreciseFurniture.LeftButton.Description": "Keybind for moving furniture left",
 
-  "Config.FurnitureAdjustmentContinued.BlacklistKey.Name": "Blacklist Key",
-  "Config.FurnitureAdjustmentContinued.BlacklistKey.Description": "Keybind for blacklisting furniture",
+  "Config.PreciseFurniture.RightButton.Name": "Right Button",
+  "Config.PreciseFurniture.RightButton.Description": "Keybind for moving furniture right",
 
-  "Config.FurnitureAdjustmentContinued.ModKey.Name": "Mod Button",
-  "Config.FurnitureAdjustmentContinued.ModKey.Description": "Keybind for increasing the move speed",
+  "Config.PreciseFurniture.BlacklistKey.Name": "Lock Furniture Button",
+  "Config.PreciseFurniture.BlacklistKey.Description": "Keybind for locking furniture",
 
-  "Config.FurnitureAdjustmentContinued.ModSpeed.Name": "Mod Speed",
-  "Config.FurnitureAdjustmentContinued.ModSpeed.Description": "How much the mod button should increase move speed by",
+  "Config.PreciseFurniture.ModKey.Name": "Speed Modifier Button",
+  "Config.PreciseFurniture.ModKey.Description": "Keybind for increasing the move speed",
 
-  "Config.FurnitureAdjustmentContinued.MoveSpeed.Name": "Ticks Per Move",
-  "Config.FurnitureAdjustmentContinued.MoveSpeed.Description": "How often furniture should move when holding down the move keys",
+  "Config.PreciseFurniture.ModSpeed.Name": "Speed Modifier",
+  "Config.PreciseFurniture.ModSpeed.Description": "How much the mod button should increase move speed by",
+
+  "Config.PreciseFurniture.MoveSpeed.Name": "Ticks Per Move",
+  "Config.PreciseFurniture.MoveSpeed.Description": "How often furniture should move when holding down the move keys",
 
   // Player Messages
-  "Message.FurnitureAdjustmentContinued.AddBlacklist": "Added {{buildingName}} to the blacklist",
-  "Message.FurnitureAdjustmentContinued.RemoveBlacklist": "Removed {{buildingName}} to the blacklist",
-  "Message.FurnitureAdjustmentContinued.IsBlacklisted": "{{buildingName}} is blacklisted"
+  "Message.PreciseFurniture.AddBlacklist": "{{buildingName}} is now locked",
+  "Message.PreciseFurniture.RemoveBlacklist": "{{buildingName}} is now unlocked",
+  "Message.PreciseFurniture.IsBlacklisted": "{{buildingName}} is locked",
+  "Message.PreciseFurniture.PickupBlacklist": "You cannot pickup locked furniture"
 }
