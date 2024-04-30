@@ -2,7 +2,7 @@
   "Name": "Precise Furniture",
   "Author": "Espy",
   "Version": "1.0.0",
-  "Description": "Precise Furniture",
+  "Description": "Move furniture pixel by pixel",
   "UniqueID": "Espy.PreciseFurniture",
   "EntryDll": "PreciseFurniture.dll",
   "MinimumApiVersion": "4.0.0",
