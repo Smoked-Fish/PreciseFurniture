@@ -1,0 +1,36 @@
+{
+  "Config.FurnitureAdjustmentContinued.EnableMod.Name": "Enable Mod",
+  "Config.FurnitureAdjustmentContinued.EnableMod.Description": "Enables the mod",
+
+  "Config.FurnitureAdjustmentContinued.MoveCursor.Name": "Move Cursor with Furniture",
+  "Config.FurnitureAdjustmentContinued.MoveCursor.Description": "When moving furniture, the cursor moves with it",
+
+  "Config.FurnitureAdjustmentContinued.RaiseButton.Name": "Raise Button",
+  "Config.FurnitureAdjustmentContinued.RaiseButton.Description": "Keybind for raising furniture",
+
+  "Config.FurnitureAdjustmentContinued.LowerButton.Name": "Lower Button",
+  "Config.FurnitureAdjustmentContinued.LowerButton.Description": "Keybind for lowering furniture",
+
+  "Config.FurnitureAdjustmentContinued.LeftButton.Name": "Left Button",
+  "Config.FurnitureAdjustmentContinued.LeftButton.Description": "Keybind for moving furniture left",
+
+  "Config.FurnitureAdjustmentContinued.RightButton.Name": "Right Button",
+  "Config.FurnitureAdjustmentContinued.RightButton.Description": "Keybind for moving furniture right",
+
+  "Config.FurnitureAdjustmentContinued.BlacklistKey.Name": "Blacklist Key",
+  "Config.FurnitureAdjustmentContinued.BlacklistKey.Description": "Keybind for blacklisting furniture",
+
+  "Config.FurnitureAdjustmentContinued.ModKey.Name": "Mod Button",
+  "Config.FurnitureAdjustmentContinued.ModKey.Description": "Keybind for increasing the move speed",
+
+  "Config.FurnitureAdjustmentContinued.ModSpeed.Name": "Mod Speed",
+  "Config.FurnitureAdjustmentContinued.ModSpeed.Description": "How much the mod button should increase move speed by",
+
+  "Config.FurnitureAdjustmentContinued.MoveSpeed.Name": "Ticks Per Move",
+  "Config.FurnitureAdjustmentContinued.MoveSpeed.Description": "How often furniture should move when holding down the move keys",
+
+  // Player Messages
+  "Message.FurnitureAdjustmentContinued.AddBlacklist": "Added {{buildingName}} to the blacklist",
+  "Message.FurnitureAdjustmentContinued.RemoveBlacklist": "Removed {{buildingName}} to the blacklist",
+  "Message.FurnitureAdjustmentContinued.IsBlacklisted": "{{buildingName}} is blacklisted"
+}
