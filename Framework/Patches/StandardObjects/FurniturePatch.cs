@@ -25,7 +25,10 @@ namespace PreciseFurniture.Framework.Patches.StandardObjects
 
             if (ModEntry.modConfig.BlacklistPreventsPickup && __instance.modData.ContainsKey($"{modManifest.UniqueID}/blacklisted"))
             {
-                Game1.addHUDMessage(new HUDMessage(I18n.Message_PreciseFurniture_PickupBlacklist(), HUDMessage.error_type) { timeLeft = HUDMessage.defaultTime });
+                if (__instance.boundingBox.Value.Contains(Game1.viewport.X + Game1.getOldMouseX(), Game1.viewport.Y + Game1.getOldMouseY()))
+                {
+                    Game1.addHUDMessage(new HUDMessage(I18n.Message_PreciseFurniture_PickupBlacklist(), HUDMessage.error_type) { timeLeft = HUDMessage.defaultTime });
+                }
                 __result = false;
             }
         }
