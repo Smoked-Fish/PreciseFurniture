@@ -7,7 +7,7 @@ namespace PreciseFurniture
     {
         public bool EnableMod { get; set; } = true;
         public bool MoveCursor { get; set; } = true;
-        public bool BlacklistPreventsPickup { get; set; } = false;
+        public bool BlacklistPreventsPickup { get; set; } = true;
         public KeybindList RaiseButton { get; set; } = new KeybindList(SButton.Up);
         public KeybindList LowerButton { get; set; } = new KeybindList(SButton.Down);
         public KeybindList LeftButton { get; set; } = new KeybindList(SButton.Left);
