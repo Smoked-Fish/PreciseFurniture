@@ -46,6 +46,8 @@ namespace PreciseFurniture
 
                 // Apply StandardObject patches
                 new FishTankFurniturePatch(harmony).Apply();
+                new FurniturePatch(harmony, this.ModManifest).Apply();
+
             }
             catch (Exception e)
             {
@@ -75,6 +77,7 @@ namespace PreciseFurniture
 
                 AddOption(configApi, nameof(modConfig.EnableMod));
                 AddOption(configApi, nameof(modConfig.MoveCursor));
+                AddOption(configApi, nameof(modConfig.BlacklistPreventsPickup));
                 AddOption(configApi, nameof(modConfig.RaiseButton));
                 AddOption(configApi, nameof(modConfig.LowerButton));
                 AddOption(configApi, nameof(modConfig.LeftButton));
@@ -144,7 +147,7 @@ namespace PreciseFurniture
                 {
                     if (f.modData.ContainsKey($"{this.ModManifest.UniqueID}/blacklisted"))
                     {
-                        Game1.addHUDMessage(new HUDMessage(I18n.Message_FurnitureAdjustmentContinued_IsBlacklisted(displayName), HUDMessage.error_type) { timeLeft = HUDMessage.defaultTime });
+                        Game1.addHUDMessage(new HUDMessage(I18n.Message_PreciseFurniture_IsBlacklisted(displayName), HUDMessage.error_type) { timeLeft = HUDMessage.defaultTime });
                         continue;
                     }
 
@@ -176,13 +179,13 @@ namespace PreciseFurniture
                 {
                     if (f.modData.ContainsKey($"{this.ModManifest.UniqueID}/blacklisted"))
                     {
-                        Game1.addHUDMessage(new HUDMessage(I18n.Message_FurnitureAdjustmentContinued_RemoveBlacklist(displayName), HUDMessage.error_type) { timeLeft = HUDMessage.defaultTime });
+                        Game1.addHUDMessage(new HUDMessage(I18n.Message_PreciseFurniture_RemoveBlacklist(displayName), HUDMessage.stamina_type) { timeLeft = HUDMessage.defaultTime });
                         f.modData.Remove($"{this.ModManifest.UniqueID}/blacklisted");
                         return;
                     }
 
 
-                    Game1.addHUDMessage(new HUDMessage(I18n.Message_FurnitureAdjustmentContinued_AddBlacklist(displayName), HUDMessage.error_type) { timeLeft = HUDMessage.defaultTime });
+                    Game1.addHUDMessage(new HUDMessage(I18n.Message_PreciseFurniture_AddBlacklist(displayName), HUDMessage.health_type) { timeLeft = HUDMessage.defaultTime });
                     f.modData.Add($"{this.ModManifest.UniqueID}/blacklisted", "T");
                     return;
                 }
