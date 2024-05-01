@@ -203,8 +203,8 @@ namespace PreciseFurniture
             if (propertyInfo == null)
                 return;
 
-            Func<string> getName = () => I18n.GetByKey($"Config.PreciseFurniture.{name}.Name");
-            Func<string> getDescription = () => I18n.GetByKey($"Config.PreciseFurniture.{name}.Description");
+            Func<string> getName = () => I18n.GetByKey($"Config.{typeof(ModEntry).Namespace}.{name}.Name");
+            Func<string> getDescription = () => I18n.GetByKey($"Config.{typeof(ModEntry).Namespace}.{name}.Description");
 
             if (getName == null || getDescription == null)
                 return;
@@ -220,6 +220,24 @@ namespace PreciseFurniture
                 Func<int> getter = () => (int)propertyInfo.GetValue(modConfig);
                 Action<int> setter = value => propertyInfo.SetValue(modConfig, value);
                 configApi.AddNumberOption(ModManifest, getter, setter, getName, getDescription);
+            }
+            else if (propertyInfo.PropertyType == typeof(float))
+            {
+                Func<float> getter = () => (float)propertyInfo.GetValue(modConfig);
+                Action<float> setter = value => propertyInfo.SetValue(modConfig, value);
+                configApi.AddNumberOption(ModManifest, getter, setter, getName, getDescription);
+            }
+            else if (propertyInfo.PropertyType == typeof(string))
+            {
+                Func<string> getter = () => (string)propertyInfo.GetValue(modConfig);
+                Action<string> setter = value => propertyInfo.SetValue(modConfig, value);
+                configApi.AddTextOption(ModManifest, getter, setter, getName, getDescription);
+            }
+            else if (propertyInfo.PropertyType == typeof(SButton))
+            {
+                Func<SButton> getter = () => (SButton)propertyInfo.GetValue(modConfig);
+                Action<SButton> setter = value => propertyInfo.SetValue(modConfig, value);
+                configApi.AddKeybind(ModManifest, getter, setter, getName, getDescription);
             }
             else if (propertyInfo.PropertyType == typeof(KeybindList))
             {
