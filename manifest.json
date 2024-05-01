@@ -6,7 +6,7 @@
   "UniqueID": "Espy.PreciseFurniture",
   "EntryDll": "PreciseFurniture.dll",
   "MinimumApiVersion": "4.0.0",
-  "UpdateKeys": [],
+  "UpdateKeys": [ "Nexus:23488" ],
   "Dependencies": [
     {
       "UniqueID": "spacechase0.GenericModConfigMenu",
