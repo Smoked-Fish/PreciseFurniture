@@ -45,8 +45,9 @@ namespace PreciseFurniture
                 var harmony = new Harmony(this.ModManifest.UniqueID);
 
                 // Apply StandardObject patches
-                new FishTankFurniturePatch(harmony).Apply();
                 new FurniturePatch(harmony, this.ModManifest).Apply();
+                new BedFurniturePatch(harmony, this.ModManifest).Apply();
+                new FishTankFurniturePatch(harmony).Apply();
 
             }
             catch (Exception e)
