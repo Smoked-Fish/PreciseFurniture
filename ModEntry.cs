@@ -6,6 +6,7 @@ using StardewModdingAPI.Utilities;
 using PreciseFurniture.Framework.Managers;
 using PreciseFurniture.Framework.Interfaces;
 using PreciseFurniture.Framework.Patches.StandardObjects;
+using PreciseFurniture.Framework.Patches.Farmers;
 using Microsoft.Xna.Framework;
 using System.Reflection;
 using System;
@@ -43,6 +44,9 @@ namespace PreciseFurniture
             try
             {
                 var harmony = new Harmony(this.ModManifest.UniqueID);
+
+                // Apply Farmer patches
+                new FarmerPatch(harmony).Apply();
 
                 // Apply StandardObject patches
                 new FurniturePatch(harmony, this.ModManifest).Apply();
