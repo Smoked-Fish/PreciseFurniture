@@ -19,8 +19,8 @@ namespace PreciseFurniture
         // Shared static helpers
         internal static IMonitor monitor;
         internal static IModHelper modHelper;
-        internal static Multiplayer multiplayer;
         internal static ModConfig modConfig;
+        internal static Multiplayer multiplayer;
 
         // Managers
         internal static ApiManager apiManager;
@@ -35,30 +35,22 @@ namespace PreciseFurniture
             // Setup the monitor, helper and multiplayer
             monitor = Monitor;
             modHelper = helper;
+            modConfig = Helper.ReadConfig<ModConfig>();
             multiplayer = helper.Reflection.GetField<Multiplayer>(typeof(Game1), "multiplayer").GetValue();
 
             // Setup the manager
             apiManager = new ApiManager(monitor);
 
-            // Load the Harmony patches
-            try
-            {
-                var harmony = new Harmony(this.ModManifest.UniqueID);
 
-                // Apply Farmer patches
-                new FarmerPatch(harmony).Apply();
+            var harmony = new Harmony(this.ModManifest.UniqueID);
 
-                // Apply StandardObject patches
-                new FurniturePatch(harmony, this.ModManifest).Apply();
-                new BedFurniturePatch(harmony, this.ModManifest).Apply();
-                new FishTankFurniturePatch(harmony).Apply();
+            // Apply Farmer patches
+            new FarmerPatch(harmony).Apply();
 
-            }
-            catch (Exception e)
-            {
-                Monitor.Log($"Issue with Harmony patching: {e}", LogLevel.Error);
-                return;
-            }
+            // Apply StandardObject patches
+            new FurniturePatch(harmony, this.ModManifest).Apply();
+            new BedFurniturePatch(harmony, this.ModManifest).Apply();
+            new FishTankFurniturePatch(harmony).Apply();
 
             // Hook into GameLoop events
             helper.Events.GameLoop.GameLaunched += this.OnGameLaunched;
@@ -73,8 +65,6 @@ namespace PreciseFurniture
 
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
         {
-            modConfig = Helper.ReadConfig<ModConfig>();
-
             if (Helper.ModRegistry.IsLoaded("spacechase0.GenericModConfigMenu") && apiManager.HookIntoGenericModConfigMenu(Helper))
             {
                 var configApi = apiManager.GetGenericModConfigMenuApi();
