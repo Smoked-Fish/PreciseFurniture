@@ -21,7 +21,7 @@ namespace PreciseFurniture.Framework.Patches.StandardObjects
         }
         internal void Apply()
         {
-            Patch(true, nameof(BedFurniture.canBeRemoved), nameof(CanBeRemovedPostFix), [typeof(Farmer)]);
+            Patch(PatchType.Postfix, nameof(BedFurniture.canBeRemoved), nameof(CanBeRemovedPostFix), [typeof(Farmer)]);
         }
 
         // Prevent picking up locked furniture

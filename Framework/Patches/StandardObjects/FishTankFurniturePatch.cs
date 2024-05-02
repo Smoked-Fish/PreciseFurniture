@@ -10,7 +10,7 @@ namespace PreciseFurniture.Framework.Patches.StandardObjects
         internal FishTankFurniturePatch(Harmony harmony) : base(harmony, typeof(FishTankFurniture)) { }
         internal void Apply()
         {
-            Patch(true, nameof(FishTankFurniture.GetTankBounds), nameof(GetTankBoundsPostfix));
+            Patch(PatchType.Postfix, nameof(FishTankFurniture.GetTankBounds), nameof(GetTankBoundsPostfix));
         }
 
         private static void GetTankBoundsPostfix(FishTankFurniture __instance, ref Rectangle __result)

@@ -16,7 +16,7 @@ namespace PreciseFurniture.Framework.Patches.Farmers
         internal FarmerPatch(Harmony harmony) : base(harmony, typeof(Farmer)) { }
         internal void Apply()
         {
-            Patch(false, nameof(Farmer.StopSitting), nameof(StopSittingPrefix), [typeof(bool)]);
+            Patch(PatchType.Prefix, nameof(Farmer.StopSitting), nameof(StopSittingPrefix), [typeof(bool)]);
         }
 
         private static bool StopSittingPrefix(Farmer __instance, bool animate = true)
