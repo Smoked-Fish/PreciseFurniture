@@ -1,35 +1,44 @@
 ﻿using StardewModdingAPI;
 using PreciseFurniture.Framework.Interfaces;
 using System;
+using System.Collections.Generic;
 
 namespace PreciseFurniture.Framework.Managers
 {
     internal class ApiManager
     {
-        private IMonitor _monitor;
-        private IGenericModConfigMenuApi _genericModConfigMenuApi;
+        private readonly Dictionary<Type, object> _apis;
 
-        public ApiManager(IMonitor monitor)
+        public ApiManager()
         {
-            _monitor = monitor;
+            _apis = new Dictionary<Type, object>();
         }
-        internal bool HookIntoGenericModConfigMenu(IModHelper helper)
-        {
-            _genericModConfigMenuApi = helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
 
-            if (_genericModConfigMenuApi is null)
+        public T GetApi<T>(string apiName, bool logError = true) where T : class
+        {
+            if (_apis.TryGetValue(typeof(T), out var api) && api is T typedApi)
             {
-                _monitor.Log("Failed to hook into spacechase0.GenericModConfigMenu.", LogLevel.Error);
-                return false;
+                return typedApi;
             }
 
-            _monitor.Log("Successfully hooked into spacechase0.GenericModConfigMenu.", LogLevel.Trace);
-            return true;
-        }
+            api = ModEntry.modHelper.ModRegistry.GetApi<T>(apiName);
 
-        public IGenericModConfigMenuApi GetGenericModConfigMenuApi()
-        {
-            return _genericModConfigMenuApi;
+            if (api == null)
+            {
+                if (logError)
+                {
+                    ModEntry.monitor.Log($"Failed to hook into {apiName}.", LogLevel.Error);
+                }
+                else
+                {
+                    ModEntry.monitor.Log($"Failed to hook into {apiName}.", LogLevel.Trace);
+                }
+                return null;
+            }
+
+            _apis[typeof(T)] = api;
+            ModEntry.monitor.Log($"Successfully hooked into {apiName}.", LogLevel.Trace);
+            return (T)api;
         }
     }
 }
