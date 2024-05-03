@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using StardewValley;
 using StardewValley.Objects;
 using StardewModdingAPI;
@@ -26,8 +26,7 @@ namespace PreciseFurniture
         internal static ApiManager apiManager;
 
         public static int ticks = 0;
-public static Furniture movedFurniture;
-        public static Vector2 testMouse = Vector2.Zero;
+        public static Furniture furnitureToMove;
         public static bool hasJustMovedFurniture;
 
         public override void Entry(IModHelper helper)
@@ -61,7 +60,7 @@ public static Furniture movedFurniture;
 
             // Hook into Input events
             helper.Events.Input.ButtonsChanged += OnButtonsChanged;
-helper.Events.Input.CursorMoved += OnCusorMoved;
+            helper.Events.Input.CursorMoved += OnCusorMoved;
 
             // Hook into World events
             helper.Events.World.FurnitureListChanged += OnFurnitureListChanged;
@@ -72,7 +71,6 @@ helper.Events.Input.CursorMoved += OnCusorMoved;
             var configApi = apiManager.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu", false);
             if (Helper.ModRegistry.IsLoaded("spacechase0.GenericModConfigMenu") && configApi != null)
             {
-                var configApi = apiManager.GetGenericModConfigMenuApi();
                 configApi.Register(ModManifest, () => modConfig = new ModConfig(), () => Helper.WriteConfig(modConfig));
 
                 AddOption(configApi, nameof(modConfig.EnableMod));
@@ -125,8 +123,26 @@ helper.Events.Input.CursorMoved += OnCusorMoved;
                 MoveFurniture(1, 0);
         }
 
+        private void OnCusorMoved(object sender, CursorMovedEventArgs e)
+        {
+            if (!modConfig.EnableMod || !Context.IsWorldReady || furnitureToMove == null)
+                return;
+
+            if (furnitureToMove.boundingBox.Value.Contains(Game1.viewport.X + e.NewPosition.ScreenPixels.X, Game1.viewport.Y + e.NewPosition.ScreenPixels.Y) && hasJustMovedFurniture)
+            {
+                hasJustMovedFurniture = false;
+            }
+            else
+            {
+                furnitureToMove = null;
+            }
+        }
+
         private void OnFurnitureListChanged(object sender, FurnitureListChangedEventArgs e)
         {
+            if (!modConfig.EnableMod || !Context.IsWorldReady)
+                return;
+
             foreach (Furniture f in e.Removed)
             {
                 if (f.modData.ContainsKey($"{this.ModManifest.UniqueID}/blacklisted"))
@@ -140,30 +156,59 @@ helper.Events.Input.CursorMoved += OnCusorMoved;
         {
             int mod = (modConfig.ModKey.IsDown() ? modConfig.ModSpeed : 1);
             Point shift = new Point(x * mod, y * mod);
-            foreach (var f in Game1.currentLocation.furniture)
+
+            Furniture selectedFurniture = GetSelectedFurniture(shift);
+
+            if (selectedFurniture == null && furnitureToMove != null)
             {
-                string displayName = string.IsNullOrEmpty(f.displayName) ? f.name : f.displayName;
-                if (f.boundingBox.Value.Contains(Game1.viewport.X + Game1.getOldMouseX(), Game1.viewport.Y + Game1.getOldMouseY()))
+                selectedFurniture = furnitureToMove;
+            }
+
+            if (selectedFurniture != null)
+            {
+                MoveSelectedFurniture(selectedFurniture, shift);
+            }
+        }
+
+        private Furniture GetSelectedFurniture(Point shift)
+        {
+            foreach (var furniture in Game1.currentLocation.furniture)
+            {
+                if (furnitureToMove != null && furnitureToMove.boundingBox.Value.Contains(Game1.viewport.X + Game1.getOldMouseX(), Game1.viewport.Y + Game1.getOldMouseY()))
                 {
-                    if (f.modData.ContainsKey($"{this.ModManifest.UniqueID}/blacklisted"))
+                    return null;
+                }
+
+                string displayName = string.IsNullOrEmpty(furniture.displayName) ? furniture.name : furniture.displayName;
+                if (furniture.boundingBox.Value.Contains(Game1.viewport.X + Game1.getOldMouseX(), Game1.viewport.Y + Game1.getOldMouseY()))
+                {
+                    if (furniture.modData.ContainsKey($"{this.ModManifest.UniqueID}/blacklisted"))
                     {
                         Game1.addHUDMessage(new HUDMessage(I18n.Message_PreciseFurniture_IsBlacklisted(displayName), HUDMessage.error_type) { timeLeft = HUDMessage.defaultTime });
                         continue;
                     }
-
-
-                    Game1.currentLocation.furniture.Remove(f);
-                    f.removeLights();
-                    f.RemoveLightGlow();
-                    f.boundingBox.Value = new Rectangle(f.boundingBox.Value.Location + shift, f.boundingBox.Value.Size);
-                    Game1.currentLocation.furniture.Add(f);
-                    f.updateDrawPosition();
-
-                    if (modConfig.MoveCursor)
-                        Game1.setMousePosition(Game1.getOldMouseX() + shift.X, Game1.getOldMouseY() + shift.Y);
-
-                    return;
+                    return furniture;
                 }
+            }
+            return null;
+        }
+
+        private void MoveSelectedFurniture(Furniture selectedFurniture, Point shift)
+        {
+            Game1.currentLocation.furniture.Remove(selectedFurniture);
+            selectedFurniture.removeLights();
+            selectedFurniture.RemoveLightGlow();
+            selectedFurniture.boundingBox.Value = new Rectangle(selectedFurniture.boundingBox.Value.Location + shift, selectedFurniture.boundingBox.Value.Size);
+            Game1.currentLocation.furniture.Add(selectedFurniture);
+            selectedFurniture.updateDrawPosition();
+
+            if (modConfig.MoveCursor && selectedFurniture.boundingBox.Value.Contains(Game1.viewport.X + Game1.getOldMouseX(), Game1.viewport.Y + Game1.getOldMouseY()))
+            {
+                furnitureToMove = selectedFurniture;
+                Point rawMousePos = Game1.getMousePositionRaw();
+                Point newRawMousePos = new Point(rawMousePos.X += shift.X, rawMousePos.Y += shift.Y);
+                Game1.setMousePositionRaw(newRawMousePos.X, newRawMousePos.Y);
+                hasJustMovedFurniture = true;
             }
         }
 
@@ -196,19 +241,19 @@ helper.Events.Input.CursorMoved += OnCusorMoved;
         {
             PropertyInfo propertyInfo = typeof(ModConfig).GetProperty(name);
             if (propertyInfo == null)
-{
+            {
                 Monitor.Log($"Error: Property '{name}' not found in ModConfig.", LogLevel.Error);
                 return;
-}
+            }
 
             Func<string> getName = () => I18n.GetByKey($"Config.{typeof(ModEntry).Namespace}.{name}.Name");
             Func<string> getDescription = () => I18n.GetByKey($"Config.{typeof(ModEntry).Namespace}.{name}.Description");
 
             if (getName == null || getDescription == null)
-{
+            {
                 Monitor.Log($"Error: Localization keys for '{name}' not found.", LogLevel.Error);
                 return;
-}
+            }
 
             var getterMethod = propertyInfo.GetGetMethod();
             var setterMethod = propertyInfo.GetSetMethod();
@@ -226,19 +271,19 @@ helper.Events.Input.CursorMoved += OnCusorMoved;
             {
                 case nameof(Boolean):
                     configApi.AddBoolOption(ModManifest, (Func<bool>)getter, (Action<bool>)setter, getName, getDescription);
-            break;
+                    break;
                 case nameof(Int32):
                     configApi.AddNumberOption(ModManifest, (Func<int>)getter, (Action<int>)setter, getName, getDescription);
                     break;
                 case nameof(Single):
                     configApi.AddNumberOption(ModManifest, (Func<float>)getter, (Action<float>)setter, getName, getDescription);
-            break;
+                    break;
                 case nameof(String):
                     configApi.AddTextOption(ModManifest, (Func<string>)getter, (Action<string>)setter, getName, getDescription);
                     break;
                 case nameof(SButton):
                     configApi.AddKeybind(ModManifest, (Func<SButton>)getter, (Action<SButton>)setter, getName, getDescription);
-            break;
+                    break;
                 case nameof(KeybindList):
                     configApi.AddKeybindList(ModManifest, (Func<KeybindList>)getter, (Action<KeybindList>)setter, getName, getDescription);
                     break;
