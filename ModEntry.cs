@@ -1,5 +1,6 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using StardewValley;
+using StardewValley.Objects;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
@@ -10,7 +11,6 @@ using PreciseFurniture.Framework.Patches.Farmers;
 using Microsoft.Xna.Framework;
 using System.Reflection;
 using System;
-using StardewValley.Objects;
 
 namespace PreciseFurniture
 {
@@ -26,6 +26,9 @@ namespace PreciseFurniture
         internal static ApiManager apiManager;
 
         public static int ticks = 0;
+public static Furniture movedFurniture;
+        public static Vector2 testMouse = Vector2.Zero;
+        public static bool hasJustMovedFurniture;
 
         public override void Entry(IModHelper helper)
         {
@@ -39,7 +42,7 @@ namespace PreciseFurniture
             multiplayer = helper.Reflection.GetField<Multiplayer>(typeof(Game1), "multiplayer").GetValue();
 
             // Setup the manager
-            apiManager = new ApiManager(monitor);
+            apiManager = new ApiManager();
 
 
             var harmony = new Harmony(this.ModManifest.UniqueID);
@@ -58,6 +61,7 @@ namespace PreciseFurniture
 
             // Hook into Input events
             helper.Events.Input.ButtonsChanged += OnButtonsChanged;
+helper.Events.Input.CursorMoved += OnCusorMoved;
 
             // Hook into World events
             helper.Events.World.FurnitureListChanged += OnFurnitureListChanged;
@@ -65,7 +69,8 @@ namespace PreciseFurniture
 
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
         {
-            if (Helper.ModRegistry.IsLoaded("spacechase0.GenericModConfigMenu") && apiManager.HookIntoGenericModConfigMenu(Helper))
+            var configApi = apiManager.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu", false);
+            if (Helper.ModRegistry.IsLoaded("spacechase0.GenericModConfigMenu") && configApi != null)
             {
                 var configApi = apiManager.GetGenericModConfigMenuApi();
                 configApi.Register(ModManifest, () => modConfig = new ModConfig(), () => Helper.WriteConfig(modConfig));
