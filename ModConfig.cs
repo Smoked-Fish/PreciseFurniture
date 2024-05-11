@@ -29,7 +29,7 @@ namespace PreciseFurniture
         public KeybindList RightButton { get; set; }
 
         [DefaultValue(SButton.MouseRight)]
-        public KeybindList BlacklistKey { get; set; } 
+        public KeybindList BlacklistKey { get; set; }
 
         [DefaultValue(SButton.LeftAlt)]
         public KeybindList ModKey { get; set; }
