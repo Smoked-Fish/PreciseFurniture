@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using Common.Managers;
+using HarmonyLib;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
@@ -18,6 +19,7 @@ namespace PreciseFurniture.Framework.Patches.StandardObjects
         {
             Patch(PatchType.Postfix, nameof(Furniture.canBeRemoved), nameof(CanBeRemovedPostFix), [typeof(Farmer)]);
             Patch(PatchType.Prefix, nameof(Furniture.GetSeatPositions), nameof(GetSeatPositionsPrefix), [typeof(bool)]);
+            Patch(PatchType.Postfix, nameof(Furniture.IntersectsForCollision), nameof(IntersectsForCollisionPostfix), [typeof(Rectangle)]);
         }
 
         // Prevent picking up locked furniture
@@ -28,9 +30,9 @@ namespace PreciseFurniture.Framework.Patches.StandardObjects
 
             if (ModEntry.modConfig.BlacklistPreventsPickup && __instance.modData.ContainsKey($"{modManifest.UniqueID}/blacklisted"))
             {
-                if (__instance.boundingBox.Value.Contains(Game1.viewport.X + Game1.getOldMouseX(), Game1.viewport.Y + Game1.getOldMouseY()))
+                if (ModEntry.furnitureToMove == null)
                 {
-                    Game1.addHUDMessage(new HUDMessage(I18n.Message_PreciseFurniture_PickupBlacklist(), HUDMessage.error_type) { timeLeft = HUDMessage.defaultTime });
+                    Game1.addHUDMessage(new HUDMessage(TranslationHelper.GetByKey("Message.PreciseFurniture.PickupBlacklist"), HUDMessage.error_type) { timeLeft = HUDMessage.defaultTime });
                 }
                 __result = false;
             }
@@ -106,6 +108,18 @@ namespace PreciseFurniture.Framework.Patches.StandardObjects
             }
             __result = seat_positions;
             return false;
+        }
+
+        // Make furniture as passable
+        private static void IntersectsForCollisionPostfix(Furniture __instance, Rectangle rect, ref bool __result)
+        {
+            if (!ModEntry.modConfig.EnableMod)
+                return;
+
+            if (__instance.modData.ContainsKey($"{modManifest.UniqueID}/passable"))
+            {
+                __result = false;
+            }
         }
     }
 }
