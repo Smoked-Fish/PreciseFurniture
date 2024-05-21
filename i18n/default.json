@@ -23,6 +23,9 @@
   "Config.PreciseFurniture.BlacklistKey.Name": "Lock Furniture Button",
   "Config.PreciseFurniture.BlacklistKey.Description": "Keybind for locking furniture",
 
+  "Config.PreciseFurniture.PassableKey.Name": "Passable Furniture Button",
+  "Config.PreciseFurniture.PassableKey.Description": "Keybind for disabling the hitbox on furniture",
+
   "Config.PreciseFurniture.ModKey.Name": "Speed Modifier Button",
   "Config.PreciseFurniture.ModKey.Description": "Keybind for increasing the move speed",
 
@@ -33,8 +36,10 @@
   "Config.PreciseFurniture.MoveSpeed.Description": "How often furniture should move when holding down the move keys",
 
   // Player Messages
-  "Message.PreciseFurniture.AddBlacklist": "{{buildingName}} is now locked",
-  "Message.PreciseFurniture.RemoveBlacklist": "{{buildingName}} is now unlocked",
-  "Message.PreciseFurniture.IsBlacklisted": "{{buildingName}} is locked",
+  "Message.PreciseFurniture.AddPassable": "{{furnitureName}} is now passable",
+  "Message.PreciseFurniture.RemovePassable": "Removed {{furnitureName}} from the passable list",
+  "Message.PreciseFurniture.AddBlacklist": "{{furnitureName}} is now locked",
+  "Message.PreciseFurniture.RemoveBlacklist": "{{furnitureName}} is now unlocked",
+  "Message.PreciseFurniture.IsBlacklisted": "{{furnitureName}} is locked",
   "Message.PreciseFurniture.PickupBlacklist": "You cannot pickup locked furniture"
 }
