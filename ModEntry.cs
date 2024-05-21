@@ -3,13 +3,11 @@ using StardewValley;
 using StardewValley.Objects;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
-using StardewModdingAPI.Utilities;
 using PreciseFurniture.Framework.Patches.StandardObjects;
 using PreciseFurniture.Framework.Patches.Farmers;
 using Microsoft.Xna.Framework;
-using System.Reflection;
-using System;
 using Common.Managers;
+using System.Linq;
 
 namespace PreciseFurniture
 {
@@ -19,7 +17,7 @@ namespace PreciseFurniture
         internal static IMonitor monitor;
         internal static IModHelper modHelper;
         internal static ModConfig modConfig;
-        internal static Multiplayer multiplayer;
+        private static Harmony harmony;
 
         public static int ticks = 0;
         public static Furniture furnitureToMove;
@@ -27,16 +25,11 @@ namespace PreciseFurniture
 
         public override void Entry(IModHelper helper)
         {
-            // Setup i18n
-            I18n.Init(helper.Translation);
-
             // Setup the monitor, helper and multiplayer
             monitor = Monitor;
             modHelper = helper;
             modConfig = Helper.ReadConfig<ModConfig>();
-            multiplayer = helper.Reflection.GetField<Multiplayer>(typeof(Game1), "multiplayer").GetValue();
-
-            var harmony = new Harmony(this.ModManifest.UniqueID);
+            harmony = new Harmony(this.ModManifest.UniqueID);
 
             // Apply Farmer patches
             new FarmerPatch(harmony).Apply();
@@ -60,7 +53,7 @@ namespace PreciseFurniture
 
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
         {
-            ConfigManager.Initialize(ModManifest, modConfig, modHelper, monitor);
+            ConfigManager.Initialize(ModManifest, modConfig, modHelper, monitor, harmony);
             if (Helper.ModRegistry.IsLoaded("spacechase0.GenericModConfigMenu"))
             {
                 ConfigManager.AddOption(nameof(modConfig.EnableMod));
@@ -71,6 +64,7 @@ namespace PreciseFurniture
                 ConfigManager.AddOption(nameof(modConfig.LeftButton));
                 ConfigManager.AddOption(nameof(modConfig.RightButton));
                 ConfigManager.AddOption(nameof(modConfig.BlacklistKey));
+                ConfigManager.AddOption(nameof(modConfig.PassableKey));
                 ConfigManager.AddOption(nameof(modConfig.ModKey));
                 ConfigManager.AddOption(nameof(modConfig.ModSpeed));
                 ConfigManager.AddOption(nameof(modConfig.MoveSpeed));
@@ -103,6 +97,8 @@ namespace PreciseFurniture
 
             if (modConfig.BlacklistKey.JustPressed())
                 BlacklistFurniture();
+            else if (modConfig.PassableKey.JustPressed())
+                SetPassableFurniture();
             else if (modConfig.RaiseButton.JustPressed())
                 MoveFurniture(0, -1);
             else if (modConfig.LowerButton.JustPressed())
@@ -118,7 +114,7 @@ namespace PreciseFurniture
             if (!modConfig.EnableMod || !Context.IsWorldReady || furnitureToMove == null)
                 return;
 
-            if (furnitureToMove.boundingBox.Value.Contains(Game1.viewport.X + e.NewPosition.ScreenPixels.X, Game1.viewport.Y + e.NewPosition.ScreenPixels.Y) && hasJustMovedFurniture)
+            if (hasJustMovedFurniture)
             {
                 hasJustMovedFurniture = false;
             }
@@ -130,26 +126,23 @@ namespace PreciseFurniture
 
         private void OnFurnitureListChanged(object sender, FurnitureListChangedEventArgs e)
         {
-            if (!modConfig.EnableMod || !Context.IsWorldReady)
+            if (!Context.IsWorldReady)
                 return;
 
             foreach (Furniture f in e.Removed)
             {
-                if (f.modData.ContainsKey($"{this.ModManifest.UniqueID}/blacklisted"))
-                {
-                    f.modData.Remove($"{this.ModManifest.UniqueID}/blacklisted");
-                }
+                f.modData.Remove($"{this.ModManifest.UniqueID}/blacklisted");
+                f.modData.Remove($"{this.ModManifest.UniqueID}/passable");
             }
         }
-
         private void MoveFurniture(int x, int y)
         {
             int mod = (modConfig.ModKey.IsDown() ? modConfig.ModSpeed : 1);
             Point shift = new Point(x * mod, y * mod);
 
-            Furniture selectedFurniture = GetSelectedFurniture(shift);
+            Furniture selectedFurniture = GetSelectedFurniture();
 
-            if (selectedFurniture == null && furnitureToMove != null)
+            if (furnitureToMove != null)
             {
                 selectedFurniture = furnitureToMove;
             }
@@ -160,21 +153,21 @@ namespace PreciseFurniture
             }
         }
 
-        private Furniture GetSelectedFurniture(Point shift)
+        private Furniture GetSelectedFurniture()
         {
-            foreach (var furniture in Game1.currentLocation.furniture)
-            {
-                if (furnitureToMove != null && furnitureToMove.boundingBox.Value.Contains(Game1.viewport.X + Game1.getOldMouseX(), Game1.viewport.Y + Game1.getOldMouseY()))
-                {
-                    return null;
-                }
+            var orderedFurniture = Game1.currentLocation.furniture.OrderBy(f => f.furniture_type.Value == 12).ToList();
 
-                string displayName = string.IsNullOrEmpty(furniture.displayName) ? furniture.name : furniture.displayName;
+            foreach (var furniture in orderedFurniture)
+            {
+                if (furnitureToMove != null) 
+                    return null;
+
+                string furnitureName = string.IsNullOrEmpty(furniture.displayName) ? furniture.name : furniture.displayName;
                 if (furniture.boundingBox.Value.Contains(Game1.viewport.X + Game1.getOldMouseX(), Game1.viewport.Y + Game1.getOldMouseY()))
                 {
                     if (furniture.modData.ContainsKey($"{this.ModManifest.UniqueID}/blacklisted"))
                     {
-                        Game1.addHUDMessage(new HUDMessage(I18n.Message_PreciseFurniture_IsBlacklisted(displayName), HUDMessage.error_type) { timeLeft = HUDMessage.defaultTime });
+                        Game1.addHUDMessage(new HUDMessage(TranslationHelper.GetByKey("Message.PreciseFurniture.IsBlacklisted", new { furnitureName }), HUDMessage.error_type) { timeLeft = HUDMessage.defaultTime });
                         continue;
                     }
                     return furniture;
@@ -183,7 +176,7 @@ namespace PreciseFurniture
             return null;
         }
 
-        private void MoveSelectedFurniture(Furniture selectedFurniture, Point shift)
+        private static void MoveSelectedFurniture(Furniture selectedFurniture, Point shift)
         {
             Game1.currentLocation.furniture.Remove(selectedFurniture);
             selectedFurniture.removeLights();
@@ -192,13 +185,14 @@ namespace PreciseFurniture
             Game1.currentLocation.furniture.Add(selectedFurniture);
             selectedFurniture.updateDrawPosition();
 
+            furnitureToMove = selectedFurniture;
+            hasJustMovedFurniture = true;
+
             if (modConfig.MoveCursor && selectedFurniture.boundingBox.Value.Contains(Game1.viewport.X + Game1.getOldMouseX(), Game1.viewport.Y + Game1.getOldMouseY()))
             {
-                furnitureToMove = selectedFurniture;
                 Point rawMousePos = Game1.getMousePositionRaw();
                 Point newRawMousePos = new Point(rawMousePos.X += shift.X, rawMousePos.Y += shift.Y);
                 Game1.setMousePositionRaw(newRawMousePos.X, newRawMousePos.Y);
-                hasJustMovedFurniture = true;
             }
         }
 
@@ -207,21 +201,48 @@ namespace PreciseFurniture
             if (!modConfig.ModKey.IsDown())
                 return;
 
-            foreach (var f in Game1.currentLocation.furniture)
+            var orderedFurniture = Game1.currentLocation.furniture.OrderBy(f => f.furniture_type.Value == 12).ToList();
+
+            foreach (var f in orderedFurniture)
             {
-                string displayName = string.IsNullOrEmpty(f.displayName) ? f.name : f.displayName;
-                if (f.boundingBox.Value.Contains(Game1.viewport.X + Game1.getOldMouseX(), Game1.viewport.Y + Game1.getOldMouseY()))
+                string furnitureName = string.IsNullOrEmpty(f.displayName) ? f.name : f.displayName;
+                if (f.boundingBox.Value.Contains(Game1.viewport.X + Game1.getOldMouseX(), Game1.viewport.Y + Game1.getOldMouseY()) && f.hovering)
                 {
                     if (f.modData.ContainsKey($"{this.ModManifest.UniqueID}/blacklisted"))
                     {
-                        Game1.addHUDMessage(new HUDMessage(I18n.Message_PreciseFurniture_RemoveBlacklist(displayName), HUDMessage.stamina_type) { timeLeft = HUDMessage.defaultTime });
+                        Game1.addHUDMessage(new HUDMessage(TranslationHelper.GetByKey("Message.PreciseFurniture.RemoveBlacklist", new { furnitureName }), HUDMessage.stamina_type) { timeLeft = HUDMessage.defaultTime });
                         f.modData.Remove($"{this.ModManifest.UniqueID}/blacklisted");
                         return;
                     }
-
-
-                    Game1.addHUDMessage(new HUDMessage(I18n.Message_PreciseFurniture_AddBlacklist(displayName), HUDMessage.health_type) { timeLeft = HUDMessage.defaultTime });
+                    Game1.addHUDMessage(new HUDMessage(TranslationHelper.GetByKey("Message.PreciseFurniture.AddBlacklist", new { furnitureName }), HUDMessage.health_type) { timeLeft = HUDMessage.defaultTime });
                     f.modData.Add($"{this.ModManifest.UniqueID}/blacklisted", "T");
+                    return;
+                }
+            }
+        }
+
+        private void SetPassableFurniture()
+        {
+            if (!modConfig.ModKey.IsDown())
+                return;
+
+            foreach (var f in Game1.currentLocation.furniture)
+            {
+                // Ignore rugs as they are already passable
+                if (f.furniture_type.Value == 12) continue;
+
+                string furnitureName = string.IsNullOrEmpty(f.displayName) ? f.name : f.displayName;
+                if (f.boundingBox.Value.Contains(Game1.viewport.X + Game1.getOldMouseX(), Game1.viewport.Y + Game1.getOldMouseY()) && f.hovering)
+                {
+                    if (f.modData.ContainsKey($"{this.ModManifest.UniqueID}/passable"))
+                    {
+                        Game1.addHUDMessage(new HUDMessage(TranslationHelper.GetByKey("Message.PreciseFurniture.RemovePassable", new { furnitureName }), HUDMessage.stamina_type) { timeLeft = HUDMessage.defaultTime });
+                        f.modData.Remove($"{this.ModManifest.UniqueID}/passable");
+                        return;
+                    }
+
+                    Game1.addHUDMessage(new HUDMessage(TranslationHelper.GetByKey("Message.PreciseFurniture.AddPassable", new { furnitureName }), HUDMessage.health_type) { timeLeft = HUDMessage.defaultTime });
+                    f.modData.Add($"{this.ModManifest.UniqueID}/passable", "T");
                     return;
                 }
             }
