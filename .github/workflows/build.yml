@@ -29,10 +29,9 @@ jobs:
         # Fetch the latest tag from the reference assemblies repository
         echo "REFASM_TAG=$(curl -s 'https://api.github.com/repos/Smoked-Fish/mod-reference-assemblies/tags' | jq -r '.[0].name')" >> $GITHUB_ENV
         
-        # Set up GamePath
+        # Set up Targets
         echo "GamePath=$GITHUB_WORKSPACE/GamePath" >> "$GITHUB_ENV"
-        echo "<Project><PropertyGroup><GamePath>$GITHUB_WORKSPACE/GamePath</GamePath></PropertyGroup></Project>" > "$HOME/stardewvalley.targets"
-        
+        echo "<Project><PropertyGroup><GamePath>$GITHUB_WORKSPACE/GamePath</GamePath></PropertyGroup></Project>" > "$HOME/stardewvalley.targets"        
     # Step 3: Cache NuGet packages
     - name: Cache NuGet
       id: cache-nuget
