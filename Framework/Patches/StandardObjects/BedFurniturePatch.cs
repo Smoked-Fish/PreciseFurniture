@@ -2,14 +2,9 @@
 using StardewModdingAPI;
 using StardewValley.Objects;
 using StardewValley;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
-using static StardewValley.Objects.BedFurniture;
 using Common.Managers;
+using Common.Util;
 
 namespace PreciseFurniture.Framework.Patches.StandardObjects
 {
@@ -36,7 +31,7 @@ namespace PreciseFurniture.Framework.Patches.StandardObjects
             {
                 if (__instance.boundingBox.Value.Contains(Game1.viewport.X + Game1.getOldMouseX(), Game1.viewport.Y + Game1.getOldMouseY()))
                 {
-                    Game1.addHUDMessage(new HUDMessage(TranslationHelper.GetByKey("Message.PreciseFurniture.PickupBlacklist"), HUDMessage.error_type) { timeLeft = HUDMessage.defaultTime });
+                    Game1.addHUDMessage(new HUDMessage(I18n.Message("PickupBlacklist"), HUDMessage.error_type) { timeLeft = HUDMessage.defaultTime });
                 }
                 __result = false;
             }

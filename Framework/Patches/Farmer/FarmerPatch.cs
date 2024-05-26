@@ -1,13 +1,10 @@
 ﻿using HarmonyLib;
-using StardewModdingAPI;
-using StardewValley.Objects;
 using StardewValley;
-using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using Object = StardewValley.Object;
 using StardewValley.Util;
 using System.Reflection;
+using Common.Util;
 
 namespace PreciseFurniture.Framework.Patches.Farmers
 {
@@ -77,7 +74,7 @@ namespace PreciseFurniture.Framework.Patches.Farmers
                     __instance.setTileLocation(exit_position);
                     Rectangle boundingBox = __instance.GetBoundingBox();
                     __instance.Position = old_position;
-                    Object tile_object = __instance.currentLocation.getObjectAtTile((int)exit_position.X, (int)exit_position.Y, ignorePassables: true);
+                    SObject tile_object = __instance.currentLocation.getObjectAtTile((int)exit_position.X, (int)exit_position.Y, ignorePassables: true);
                     if (!__instance.currentLocation.isCollidingPosition(boundingBox, Game1.viewport, isFarmer: true, 0, glider: false, __instance) /*&& (tile_object == null || tile_object.isPassable())*/)
                     {
                         if (!(tile_object == null || tile_object.isPassable()))

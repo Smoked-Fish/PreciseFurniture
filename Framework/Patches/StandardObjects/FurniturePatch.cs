@@ -1,4 +1,5 @@
 ﻿using Common.Managers;
+using Common.Util;
 using HarmonyLib;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
@@ -32,7 +33,7 @@ namespace PreciseFurniture.Framework.Patches.StandardObjects
             {
                 if (ModEntry.furnitureToMove == null)
                 {
-                    Game1.addHUDMessage(new HUDMessage(TranslationHelper.GetByKey("Message.PreciseFurniture.PickupBlacklist"), HUDMessage.error_type) { timeLeft = HUDMessage.defaultTime });
+                    Game1.addHUDMessage(new HUDMessage(I18n.Message("PickupBlacklist"), HUDMessage.error_type) { timeLeft = HUDMessage.defaultTime });
                 }
                 __result = false;
             }
@@ -66,7 +67,7 @@ namespace PreciseFurniture.Framework.Patches.StandardObjects
             }
             if ((int)__instance.furniture_type.Value == 2)
             {
-                int width = __instance.defaultBoundingBox.Width / 64 - 1;
+                int width = (__instance.defaultBoundingBox.Width / 64) - 1;
                 if ((int)__instance.currentRotation.Value == 0 || (int)__instance.currentRotation.Value == 2)
                 {
                     seat_positions.Add(rectTileLocation + new Vector2(0.5f, 0f));
