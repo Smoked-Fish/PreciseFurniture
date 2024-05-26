@@ -31,7 +31,7 @@ jobs:
         
         # Set up Targets
         echo "GamePath=$GITHUB_WORKSPACE/GamePath" >> "$GITHUB_ENV"
-        echo "<Project><PropertyGroup><GamePath>$GITHUB_WORKSPACE/GamePath</GamePath><AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath></PropertyGroup></Project>" > "$HOME/stardewvalley.targets"        
+        echo "<Project><PropertyGroup><GamePath>$GITHUB_WORKSPACE/GamePath</GamePath></PropertyGroup></Project>" > "$HOME/stardewvalley.targets"        
     # Step 3: Cache NuGet packages
     - name: Cache NuGet
       id: cache-nuget
