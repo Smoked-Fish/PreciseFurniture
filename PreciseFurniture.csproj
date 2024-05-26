@@ -1,23 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <RootNamespace>$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+    <EnableHarmony>true</EnableHarmony>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
-        <LangVersion>latest</LangVersion>
-        <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-        <RootNamespace>$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
-        <EnableHarmony>true</EnableHarmony>
-    </PropertyGroup>
+  <ItemGroup>
+    <None Remove=".gitignore" />
+    <None Remove=".gitmodules" />
+    <None Remove="Framework\Common\.git" />
+    <None Remove="LICENSE" />
+    <None Remove="README.md" />
+  </ItemGroup>
 
-    <ItemGroup>
-      <None Remove=".gitignore" />
-      <None Remove=".gitmodules" />
-      <None Remove="Framework\Common\.git" />
-      <None Remove="LICENSE" />
-      <None Remove="README.md" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />
+  </ItemGroup>
 
 </Project>
