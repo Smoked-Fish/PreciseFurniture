@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿global using SObject = StardewValley.Object;
+using HarmonyLib;
 using StardewValley;
 using StardewValley.Objects;
 using StardewModdingAPI;
@@ -167,7 +168,7 @@ namespace PreciseFurniture
                 {
                     if (furniture.modData.ContainsKey($"{this.ModManifest.UniqueID}/blacklisted"))
                     {
-                        Game1.addHUDMessage(new HUDMessage(TranslationHelper.GetByKey("Message.PreciseFurniture.IsBlacklisted", new { furnitureName }), HUDMessage.error_type) { timeLeft = HUDMessage.defaultTime });
+                        Game1.addHUDMessage(new HUDMessage(I18n.Message("IsBlacklisted", new { furnitureName }), HUDMessage.error_type) { timeLeft = HUDMessage.defaultTime });
                         continue;
                     }
                     return furniture;
@@ -210,11 +211,13 @@ namespace PreciseFurniture
                 {
                     if (f.modData.ContainsKey($"{this.ModManifest.UniqueID}/blacklisted"))
                     {
-                        Game1.addHUDMessage(new HUDMessage(TranslationHelper.GetByKey("Message.PreciseFurniture.RemoveBlacklist", new { furnitureName }), HUDMessage.stamina_type) { timeLeft = HUDMessage.defaultTime });
+                        
+                        Game1.addHUDMessage(new HUDMessage(I18n.Message("RemoveBlacklist", new { furnitureName }), HUDMessage.stamina_type) { timeLeft = HUDMessage.defaultTime });
                         f.modData.Remove($"{this.ModManifest.UniqueID}/blacklisted");
                         return;
                     }
-                    Game1.addHUDMessage(new HUDMessage(TranslationHelper.GetByKey("Message.PreciseFurniture.AddBlacklist", new { furnitureName }), HUDMessage.health_type) { timeLeft = HUDMessage.defaultTime });
+                    
+                    Game1.addHUDMessage(new HUDMessage(I18n.Message("AddBlacklist", new { furnitureName }), HUDMessage.health_type) { timeLeft = HUDMessage.defaultTime });
                     f.modData.Add($"{this.ModManifest.UniqueID}/blacklisted", "T");
                     return;
                 }
@@ -236,12 +239,12 @@ namespace PreciseFurniture
                 {
                     if (f.modData.ContainsKey($"{this.ModManifest.UniqueID}/passable"))
                     {
-                        Game1.addHUDMessage(new HUDMessage(TranslationHelper.GetByKey("Message.PreciseFurniture.RemovePassable", new { furnitureName }), HUDMessage.stamina_type) { timeLeft = HUDMessage.defaultTime });
+                        Game1.addHUDMessage(new HUDMessage(I18n.Message("RemovePassable", new { furnitureName }), HUDMessage.stamina_type) { timeLeft = HUDMessage.defaultTime });
                         f.modData.Remove($"{this.ModManifest.UniqueID}/passable");
                         return;
                     }
-
-                    Game1.addHUDMessage(new HUDMessage(TranslationHelper.GetByKey("Message.PreciseFurniture.AddPassable", new { furnitureName }), HUDMessage.health_type) { timeLeft = HUDMessage.defaultTime });
+                    
+                    Game1.addHUDMessage(new HUDMessage(I18n.Message("AddPassable", new { furnitureName }), HUDMessage.health_type) { timeLeft = HUDMessage.defaultTime });
                     f.modData.Add($"{this.ModManifest.UniqueID}/passable", "T");
                     return;
                 }
