@@ -1,24 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-  
+﻿﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Project properties -->
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
-    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-    <RootNamespace>$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
     <EnableHarmony>true</EnableHarmony>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <CommonPatches>true</CommonPatches>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove=".gitignore" />
-    <None Remove=".gitmodules" />
-    <None Remove="Framework\Common\.git" />
-    <None Remove="LICENSE" />
-    <None Remove="README.md" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />
-  </ItemGroup>
-
+  
+  <!-- Import Common targets -->
+  <Import Project="Framework\Common\common.targets" />
+  
 </Project>
