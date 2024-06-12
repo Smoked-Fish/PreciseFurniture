@@ -1,14 +1,12 @@
-﻿using Common.Util;
-using HarmonyLib;
+﻿using Common.Helpers;
 using Microsoft.Xna.Framework;
 using StardewValley;
 using StardewValley.Objects;
 
 namespace PreciseFurniture.Framework.Patches.StandardObjects
 {
-    internal class FishTankFurniturePatch : PatchTemplate
+    internal class FishTankFurniturePatch() : PatchHelper(typeof(FishTankFurniture))
     {
-        internal FishTankFurniturePatch(Harmony harmony) : base(harmony, typeof(FishTankFurniture)) { }
         internal void Apply()
         {
             Patch(PatchType.Postfix, nameof(FishTankFurniture.GetTankBounds), nameof(GetTankBoundsPostfix));
@@ -16,7 +14,7 @@ namespace PreciseFurniture.Framework.Patches.StandardObjects
 
         private static void GetTankBoundsPostfix(FishTankFurniture __instance, ref Rectangle __result)
         {
-            if (!ModEntry.modConfig.EnableMod)
+            if (!ModEntry.Config.EnableMod)
                 return;
 
             Rectangle rectangle = ItemRegistry.GetDataOrErrorItem(__instance.QualifiedItemId).GetSourceRect();

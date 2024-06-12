@@ -1,6 +1,4 @@
-﻿global using SObject = StardewValley.Object;
-using HarmonyLib;
-using StardewValley;
+﻿using StardewValley;
 using StardewValley.Objects;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -9,16 +7,20 @@ using PreciseFurniture.Framework.Patches.Farmers;
 using Microsoft.Xna.Framework;
 using Common.Managers;
 using System.Linq;
+using HarmonyLib;
+using System.Threading;
+using Common.Helpers;
+using Common.Utilities;
 
 namespace PreciseFurniture
 {
     public class ModEntry : Mod
     {
         // Shared static helpers
-        internal static IMonitor monitor;
-        internal static IModHelper modHelper;
-        internal static ModConfig modConfig;
-        private static Harmony harmony;
+        public static IModHelper ModHelper { get; private set; } = null!;
+        public static IMonitor ModMonitor { get; private set; } = null!;
+        public static IManifest Manifest { get; private set; } = null!;
+        public static Config Config { get; private set; } = null!;
 
         public static int ticks = 0;
         public static Furniture furnitureToMove;
@@ -27,18 +29,21 @@ namespace PreciseFurniture
         public override void Entry(IModHelper helper)
         {
             // Setup the monitor, helper and multiplayer
-            monitor = Monitor;
-            modHelper = helper;
-            modConfig = Helper.ReadConfig<ModConfig>();
-            harmony = new Harmony(this.ModManifest.UniqueID);
+            ModMonitor = Monitor;
+            ModHelper = helper;
+            Manifest = ModEntry.Manifest;
+            Config = Helper.ReadConfig<Config>();
+
+            ConfigManager.Init(ModEntry.Manifest, Config, Helper, Monitor);
+            PatchHelper.Init(new Harmony(Manifest.UniqueID));
 
             // Apply Farmer patches
-            new FarmerPatch(harmony).Apply();
+            new FarmerPatch().Apply();
 
             // Apply StandardObject patches
-            new FurniturePatch(harmony, this.ModManifest).Apply();
-            new BedFurniturePatch(harmony, this.ModManifest).Apply();
-            new FishTankFurniturePatch(harmony).Apply();
+            new FurniturePatch().Apply();
+            new BedFurniturePatch().Apply();
+            new FishTankFurniturePatch().Apply();
 
             // Hook into GameLoop events
             helper.Events.GameLoop.GameLaunched += this.OnGameLaunched;
@@ -54,65 +59,63 @@ namespace PreciseFurniture
 
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
         {
-            ConfigManager.Initialize(ModManifest, modConfig, modHelper, monitor, harmony);
-            if (Helper.ModRegistry.IsLoaded("spacechase0.GenericModConfigMenu"))
-            {
-                ConfigManager.AddOption(nameof(modConfig.EnableMod));
-                ConfigManager.AddOption(nameof(modConfig.MoveCursor));
-                ConfigManager.AddOption(nameof(modConfig.BlacklistPreventsPickup));
-                ConfigManager.AddOption(nameof(modConfig.RaiseButton));
-                ConfigManager.AddOption(nameof(modConfig.LowerButton));
-                ConfigManager.AddOption(nameof(modConfig.LeftButton));
-                ConfigManager.AddOption(nameof(modConfig.RightButton));
-                ConfigManager.AddOption(nameof(modConfig.BlacklistKey));
-                ConfigManager.AddOption(nameof(modConfig.PassableKey));
-                ConfigManager.AddOption(nameof(modConfig.ModKey));
-                ConfigManager.AddOption(nameof(modConfig.ModSpeed));
-                ConfigManager.AddOption(nameof(modConfig.MoveSpeed));
-            }
+            if (!Helper.ModRegistry.IsLoaded("spacechase0.GenericConfigMenu")) return;
+
+            ConfigManager.AddOption(nameof(Config.EnableMod));
+            ConfigManager.AddOption(nameof(Config.MoveCursor));
+            ConfigManager.AddOption(nameof(Config.BlacklistPreventsPickup));
+            ConfigManager.AddOption(nameof(Config.RaiseButton));
+            ConfigManager.AddOption(nameof(Config.LowerButton));
+            ConfigManager.AddOption(nameof(Config.LeftButton));
+            ConfigManager.AddOption(nameof(Config.RightButton));
+            ConfigManager.AddOption(nameof(Config.BlacklistKey));
+            ConfigManager.AddOption(nameof(Config.PassableKey));
+            ConfigManager.AddOption(nameof(Config.ModKey));
+            ConfigManager.AddOption(nameof(Config.ModSpeed));
+            ConfigManager.AddOption(nameof(Config.MoveSpeed));
         }
 
         private void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
         {
-            if (!modConfig.EnableMod || !Context.IsPlayerFree)
+            if (!Config.EnableMod || !Context.IsPlayerFree)
                 return;
-            if (++ticks < modConfig.MoveSpeed)
+            if (++ticks < Config.MoveSpeed)
                 return;
 
             ticks = 0;
 
-            if (modConfig.RaiseButton.IsDown())
+            if (Config.RaiseButton.IsDown())
                 MoveFurniture(0, -1);
-            else if (modConfig.LowerButton.IsDown())
+            else if (Config.LowerButton.IsDown())
                 MoveFurniture(0, 1);
-            else if (modConfig.LeftButton.IsDown())
+            else if (Config.LeftButton.IsDown())
                 MoveFurniture(-1, 0);
-            else if (modConfig.RightButton.IsDown())
+            else if (Config.RightButton.IsDown())
                 MoveFurniture(1, 0);
         }
 
         private void OnButtonsChanged(object sender, ButtonsChangedEventArgs e)
         {
-            if (!modConfig.EnableMod || !Context.IsWorldReady)
+            if (!Config.EnableMod || !Context.IsWorldReady)
                 return;
 
-            if (modConfig.BlacklistKey.JustPressed())
+            if (Config.BlacklistKey.JustPressed())
                 BlacklistFurniture();
-            else if (modConfig.PassableKey.JustPressed())
+            else if (Config.PassableKey.JustPressed())
                 SetPassableFurniture();
-            else if (modConfig.RaiseButton.JustPressed())
+            else if (Config.RaiseButton.JustPressed())
                 MoveFurniture(0, -1);
-            else if (modConfig.LowerButton.JustPressed())
+            else if (Config.LowerButton.JustPressed())
                 MoveFurniture(0, 1);
-            else if (modConfig.LeftButton.JustPressed())
+            else if (Config.LeftButton.JustPressed())
                 MoveFurniture(-1, 0);
-            else if (modConfig.RightButton.JustPressed())
+            else if (Config.RightButton.JustPressed())
                 MoveFurniture(1, 0);
         }
 
         private void OnCusorMoved(object sender, CursorMovedEventArgs e)
         {
-            if (!modConfig.EnableMod || !Context.IsWorldReady || furnitureToMove == null)
+            if (!Config.EnableMod || !Context.IsWorldReady || furnitureToMove == null)
                 return;
 
             if (hasJustMovedFurniture)
@@ -132,13 +135,13 @@ namespace PreciseFurniture
 
             foreach (Furniture f in e.Removed)
             {
-                f.modData.Remove($"{this.ModManifest.UniqueID}/blacklisted");
-                f.modData.Remove($"{this.ModManifest.UniqueID}/passable");
+                f.modData.Remove($"{Manifest.UniqueID}/blacklisted");
+                f.modData.Remove($"{Manifest.UniqueID}/passable");
             }
         }
         private void MoveFurniture(int x, int y)
         {
-            int mod = (modConfig.ModKey.IsDown() ? modConfig.ModSpeed : 1);
+            int mod = (Config.ModKey.IsDown() ? Config.ModSpeed : 1);
             Point shift = new Point(x * mod, y * mod);
 
             Furniture selectedFurniture = GetSelectedFurniture();
@@ -166,7 +169,7 @@ namespace PreciseFurniture
                 string furnitureName = string.IsNullOrEmpty(furniture.displayName) ? furniture.name : furniture.displayName;
                 if (furniture.boundingBox.Value.Contains(Game1.viewport.X + Game1.getOldMouseX(), Game1.viewport.Y + Game1.getOldMouseY()))
                 {
-                    if (furniture.modData.ContainsKey($"{this.ModManifest.UniqueID}/blacklisted"))
+                    if (furniture.modData.ContainsKey($"{Manifest.UniqueID}/blacklisted"))
                     {
                         Game1.addHUDMessage(new HUDMessage(I18n.Message("IsBlacklisted", new { furnitureName }), HUDMessage.error_type) { timeLeft = HUDMessage.defaultTime });
                         continue;
@@ -189,7 +192,7 @@ namespace PreciseFurniture
             furnitureToMove = selectedFurniture;
             hasJustMovedFurniture = true;
 
-            if (modConfig.MoveCursor && selectedFurniture.boundingBox.Value.Contains(Game1.viewport.X + Game1.getOldMouseX(), Game1.viewport.Y + Game1.getOldMouseY()))
+            if (Config.MoveCursor && selectedFurniture.boundingBox.Value.Contains(Game1.viewport.X + Game1.getOldMouseX(), Game1.viewport.Y + Game1.getOldMouseY()))
             {
                 Point rawMousePos = Game1.getMousePositionRaw();
                 Point newRawMousePos = new Point(rawMousePos.X += shift.X, rawMousePos.Y += shift.Y);
@@ -199,7 +202,7 @@ namespace PreciseFurniture
 
         private void BlacklistFurniture()
         {
-            if (!modConfig.ModKey.IsDown())
+            if (!Config.ModKey.IsDown())
                 return;
 
             var orderedFurniture = Game1.currentLocation.furniture.OrderBy(f => f.furniture_type.Value == 12).ToList();
@@ -209,16 +212,16 @@ namespace PreciseFurniture
                 string furnitureName = string.IsNullOrEmpty(f.displayName) ? f.name : f.displayName;
                 if (f.boundingBox.Value.Contains(Game1.viewport.X + Game1.getOldMouseX(), Game1.viewport.Y + Game1.getOldMouseY()) && f.hovering)
                 {
-                    if (f.modData.ContainsKey($"{this.ModManifest.UniqueID}/blacklisted"))
+                    if (f.modData.ContainsKey($"{Manifest.UniqueID}/blacklisted"))
                     {
                         
                         Game1.addHUDMessage(new HUDMessage(I18n.Message("RemoveBlacklist", new { furnitureName }), HUDMessage.stamina_type) { timeLeft = HUDMessage.defaultTime });
-                        f.modData.Remove($"{this.ModManifest.UniqueID}/blacklisted");
+                        f.modData.Remove($"{Manifest.UniqueID}/blacklisted");
                         return;
                     }
                     
                     Game1.addHUDMessage(new HUDMessage(I18n.Message("AddBlacklist", new { furnitureName }), HUDMessage.health_type) { timeLeft = HUDMessage.defaultTime });
-                    f.modData.Add($"{this.ModManifest.UniqueID}/blacklisted", "T");
+                    f.modData.Add($"{Manifest.UniqueID}/blacklisted", "T");
                     return;
                 }
             }
@@ -226,7 +229,7 @@ namespace PreciseFurniture
 
         private void SetPassableFurniture()
         {
-            if (!modConfig.ModKey.IsDown())
+            if (!Config.ModKey.IsDown())
                 return;
 
             foreach (var f in Game1.currentLocation.furniture)
@@ -237,15 +240,15 @@ namespace PreciseFurniture
                 string furnitureName = string.IsNullOrEmpty(f.displayName) ? f.name : f.displayName;
                 if (f.boundingBox.Value.Contains(Game1.viewport.X + Game1.getOldMouseX(), Game1.viewport.Y + Game1.getOldMouseY()) && f.hovering)
                 {
-                    if (f.modData.ContainsKey($"{this.ModManifest.UniqueID}/passable"))
+                    if (f.modData.ContainsKey($"{Manifest.UniqueID}/passable"))
                     {
                         Game1.addHUDMessage(new HUDMessage(I18n.Message("RemovePassable", new { furnitureName }), HUDMessage.stamina_type) { timeLeft = HUDMessage.defaultTime });
-                        f.modData.Remove($"{this.ModManifest.UniqueID}/passable");
+                        f.modData.Remove($"{Manifest.UniqueID}/passable");
                         return;
                     }
                     
                     Game1.addHUDMessage(new HUDMessage(I18n.Message("AddPassable", new { furnitureName }), HUDMessage.health_type) { timeLeft = HUDMessage.defaultTime });
-                    f.modData.Add($"{this.ModManifest.UniqueID}/passable", "T");
+                    f.modData.Add($"{Manifest.UniqueID}/passable", "T");
                     return;
                 }
             }

@@ -1,9 +1,9 @@
-﻿﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <!-- Project properties -->
   <PropertyGroup>
     <EnableHarmony>true</EnableHarmony>
-    <CommonPatches>true</CommonPatches>
+    <CommonPatches>false</CommonPatches>
   </PropertyGroup>
   
   <!-- Import Common targets -->

@@ -4,13 +4,12 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using StardewValley.Util;
 using System.Reflection;
-using Common.Util;
+using Common.Helpers;
 
 namespace PreciseFurniture.Framework.Patches.Farmers
 {
-    internal class FarmerPatch : PatchTemplate
+    internal class FarmerPatch() : PatchHelper(typeof(Farmer))
     {
-        internal FarmerPatch(Harmony harmony) : base(harmony, typeof(Farmer)) { }
         internal void Apply()
         {
             Patch(PatchType.Prefix, nameof(Farmer.StopSitting), nameof(StopSittingPrefix), [typeof(bool)]);
@@ -18,7 +17,7 @@ namespace PreciseFurniture.Framework.Patches.Farmers
 
         private static bool StopSittingPrefix(Farmer __instance, bool animate = true)
         {
-            if (!ModEntry.modConfig.EnableMod)
+            if (!ModEntry.Config.EnableMod)
                 return true;
 
             if (__instance.sittingFurniture == null)

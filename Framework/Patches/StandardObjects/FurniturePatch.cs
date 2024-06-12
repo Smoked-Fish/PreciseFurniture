@@ -1,21 +1,14 @@
-﻿using Common.Managers;
-using Common.Util;
-using HarmonyLib;
+﻿using Common.Helpers;
+using Common.Utilities;
 using Microsoft.Xna.Framework;
-using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Objects;
 using System.Collections.Generic;
 
 namespace PreciseFurniture.Framework.Patches.StandardObjects
 {
-    internal class FurniturePatch : PatchTemplate
+    internal class FurniturePatch() : PatchHelper(typeof(Furniture))
     {
-        public static IManifest modManifest;
-        internal FurniturePatch(Harmony harmony, IManifest ModManifest) : base(harmony, typeof(Furniture)) 
-        { 
-            modManifest = ModManifest;
-        }
         internal void Apply()
         {
             Patch(PatchType.Postfix, nameof(Furniture.canBeRemoved), nameof(CanBeRemovedPostFix), [typeof(Farmer)]);
@@ -26,10 +19,10 @@ namespace PreciseFurniture.Framework.Patches.StandardObjects
         // Prevent picking up locked furniture
         private static void CanBeRemovedPostFix(Furniture __instance, Farmer who, ref bool __result)
         {
-            if (!ModEntry.modConfig.EnableMod)
+            if (!ModEntry.Config.EnableMod)
                 return;
 
-            if (ModEntry.modConfig.BlacklistPreventsPickup && __instance.modData.ContainsKey($"{modManifest.UniqueID}/blacklisted"))
+            if (ModEntry.Config.BlacklistPreventsPickup && __instance.modData.ContainsKey($"{ModEntry.Manifest.UniqueID}/blacklisted"))
             {
                 if (ModEntry.furnitureToMove == null)
                 {
@@ -42,7 +35,7 @@ namespace PreciseFurniture.Framework.Patches.StandardObjects
         // Correct chair positions
         private static bool GetSeatPositionsPrefix(Furniture __instance, ref List<Vector2> __result, bool ignore_offsets = false)
         {
-            if (!ModEntry.modConfig.EnableMod)
+            if (!ModEntry.Config.EnableMod)
                 return true;
 
             Vector2 rectTileLocation = new Vector2((float)__instance.boundingBox.X / 64f, (float)__instance.boundingBox.Y / 64f);
@@ -114,10 +107,10 @@ namespace PreciseFurniture.Framework.Patches.StandardObjects
         // Make furniture as passable
         private static void IntersectsForCollisionPostfix(Furniture __instance, Rectangle rect, ref bool __result)
         {
-            if (!ModEntry.modConfig.EnableMod)
+            if (!ModEntry.Config.EnableMod)
                 return;
 
-            if (__instance.modData.ContainsKey($"{modManifest.UniqueID}/passable"))
+            if (__instance.modData.ContainsKey($"{ModEntry.Manifest.UniqueID}/passable"))
             {
                 __result = false;
             }

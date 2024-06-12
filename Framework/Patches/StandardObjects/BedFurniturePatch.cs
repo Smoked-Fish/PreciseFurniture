@@ -1,20 +1,13 @@
-﻿using HarmonyLib;
-using StardewModdingAPI;
-using StardewValley.Objects;
-using StardewValley;
+﻿using Common.Helpers;
+using Common.Utilities;
 using Microsoft.Xna.Framework;
-using Common.Managers;
-using Common.Util;
+using StardewValley;
+using StardewValley.Objects;
 
 namespace PreciseFurniture.Framework.Patches.StandardObjects
 {
-    internal class BedFurniturePatch : PatchTemplate
+    internal class BedFurniturePatch() : PatchHelper(typeof(BedFurniture))
     {
-        public static IManifest modManifest;
-        internal BedFurniturePatch(Harmony harmony, IManifest ModManifest) : base(harmony, typeof(BedFurniture))
-        {
-            modManifest = ModManifest;
-        }
         internal void Apply()
         {
             Patch(PatchType.Postfix, nameof(BedFurniture.canBeRemoved), nameof(CanBeRemovedPostFix), [typeof(Farmer)]);
@@ -24,10 +17,10 @@ namespace PreciseFurniture.Framework.Patches.StandardObjects
         // Prevent picking up locked furniture
         private static void CanBeRemovedPostFix(BedFurniture __instance, Farmer who, ref bool __result)
         {
-            if (!ModEntry.modConfig.EnableMod)
+            if (!ModEntry.Config.EnableMod)
                 return;
 
-            if (ModEntry.modConfig.BlacklistPreventsPickup && __instance.modData.ContainsKey($"{modManifest.UniqueID}/blacklisted"))
+            if (ModEntry.Config.BlacklistPreventsPickup && __instance.modData.ContainsKey($"{ModEntry.Manifest.UniqueID}/blacklisted"))
             {
                 if (__instance.boundingBox.Value.Contains(Game1.viewport.X + Game1.getOldMouseX(), Game1.viewport.Y + Game1.getOldMouseY()))
                 {
@@ -40,10 +33,10 @@ namespace PreciseFurniture.Framework.Patches.StandardObjects
         // Make beds passable
         private static void IntersectsForCollisionPostfix(Furniture __instance, Rectangle rect, ref bool __result)
         {
-            if (!ModEntry.modConfig.EnableMod)
+            if (!ModEntry.Config.EnableMod)
                 return;
 
-            if (__instance.modData.ContainsKey($"{modManifest.UniqueID}/passable"))
+            if (__instance.modData.ContainsKey($"{ModEntry.Manifest.UniqueID}/passable"))
             {
                 __result = false;
             }
