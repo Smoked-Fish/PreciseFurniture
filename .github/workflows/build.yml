@@ -79,7 +79,7 @@ jobs:
 
     # Step 9: Build the project
     - name: Build
-      run: dotnet build --no-restore --configuration Release
+      run: dotnet build --no-restore --configuration Release /verbosity:detailed
 
     # Step 10: Unzip the mod for artifact upload
     - name: Unzip mod
