@@ -34,9 +34,6 @@ jobs:
         # Set up Targets
         echo "GamePath=$GITHUB_WORKSPACE/GamePath" >> "$GITHUB_ENV"
         echo "<Project><PropertyGroup><GamePath>$GITHUB_WORKSPACE/GamePath</GamePath></PropertyGroup></Project>" > "$HOME/stardewvalley.targets"        
-
-    - name: List Directory Contents
-      run: ls -R
       
     # Step 4: Cache NuGet packages
     - name: Cache NuGet
@@ -79,7 +76,7 @@ jobs:
 
     # Step 9: Build the project
     - name: Build
-      run: dotnet build --no-restore --configuration Release /verbosity:detailed
+      run: dotnet build --no-restore --configuration Release
 
     # Step 10: Unzip the mod for artifact upload
     - name: Unzip mod
