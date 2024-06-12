@@ -2,13 +2,10 @@
 using Common.Utilities;
 using StardewModdingAPI;
 using StardewModdingAPI.Utilities;
-using System.Collections.Generic;
-
 
 namespace PreciseFurniture;
 public sealed class Config : IConfigurable
 {
-
     [DefaultValue(true)]
     public bool EnableMod { get; set; }
 
@@ -19,25 +16,25 @@ public sealed class Config : IConfigurable
     public bool BlacklistPreventsPickup { get; set; }
 
     [DefaultValue(SButton.Up)]
-    public KeybindList RaiseButton { get; set; }
+    public KeybindList? RaiseButton { get; set; }
 
     [DefaultValue(SButton.Down)]
-    public KeybindList LowerButton { get; set; } 
+    public KeybindList? LowerButton { get; set; }
 
     [DefaultValue(SButton.Left)]
-    public KeybindList LeftButton { get; set; }
+    public KeybindList? LeftButton { get; set; }
 
     [DefaultValue(SButton.Right)]
-    public KeybindList RightButton { get; set; }
+    public KeybindList? RightButton { get; set; }
 
     [DefaultValue(SButton.MouseRight)]
-    public KeybindList BlacklistKey { get; set; }
+    public KeybindList? BlacklistKey { get; set; }
 
     [DefaultValue(SButton.None)]
-    public KeybindList PassableKey { get; set; }
+    public KeybindList? PassableKey { get; set; }
 
     [DefaultValue(SButton.LeftAlt)]
-    public KeybindList ModKey { get; set; }
+    public KeybindList? ModKey { get; set; }
 
     [DefaultValue(5)]
     public int ModSpeed { get; set; }
