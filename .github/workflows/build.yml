@@ -17,16 +17,18 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4.1.5
 
-    # Step 2: Cache the "Common" folder
-    - name: Cache Common Folder
+    # Step 2: Cache Common Project
+    - name: Cache Common Project
       id: cache-common
       uses: actions/cache@v4.0.2
       with:
         path: Common
-        key: ${{ runner.os }}-common-${{ hashFiles('Common/**') }}
+        key: ${{ runner.os }}-common-project-${{ hashFiles('Common/**') }}
+        restore-keys: |
+          ${{ runner.os }}-common-project-
 
-    # Step 3: Checkout the shared project
-    - name: Checkout Common Project
+    # Step 3: Checkout or Restore Common Project
+    - name: Checkout or Restore Common Project
       if: steps.cache-common.outputs.cache-hit != 'true'
       run: git clone https://github.com/Smoked-Fish/Common.git Common
 
