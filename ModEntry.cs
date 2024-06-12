@@ -30,11 +30,11 @@ public class ModEntry : Mod
         // Setup the monitor, helper and multiplayer
         ModMonitor = Monitor;
         ModHelper = helper;
-        Manifest = ModEntry.Manifest;
+        Manifest = ModManifest;
         Config = Helper.ReadConfig<Config>();
 
-        ConfigManager.Init(ModEntry.Manifest, Config, Helper, Monitor);
-        PatchHelper.Init(new Harmony(Manifest.UniqueID));
+        ConfigManager.Init(ModManifest, Config, Helper, Monitor);
+        PatchHelper.Init(new Harmony(ModManifest.UniqueID));
 
         // Apply Farmer patches
         new FarmerPatch().Apply();
