@@ -17,8 +17,8 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4.1.5
 
-    # Step 2: Checkout the shared project
-    - name: Checkout Common Project
+    # Step 2: Checkout Common
+    - name: Checkout or Restore Common Project
       run: git clone https://github.com/Smoked-Fish/Common.git Common
 
     # Step 3: Set environment variables
@@ -34,9 +34,6 @@ jobs:
         # Set up Targets
         echo "GamePath=$GITHUB_WORKSPACE/GamePath" >> "$GITHUB_ENV"
         echo "<Project><PropertyGroup><GamePath>$GITHUB_WORKSPACE/GamePath</GamePath></PropertyGroup></Project>" > "$HOME/stardewvalley.targets"        
-
-    - name: List Directory Contents
-      run: ls -R
       
     # Step 4: Cache NuGet packages
     - name: Cache NuGet
