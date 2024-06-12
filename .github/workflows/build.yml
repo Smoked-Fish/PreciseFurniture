@@ -19,7 +19,7 @@ jobs:
 
     # Step 2: Checkout the shared project
     - name: Checkout Common Project
-      run: git clone git@github.com:Smoked-Fish/Common.git Common
+      run: git clone https://github.com/Smoked-Fish/Common.git Common
 
     # Step 3: Set environment variables
     - name: Set Environment Variables
