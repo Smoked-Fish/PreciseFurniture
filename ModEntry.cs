@@ -1,4 +1,5 @@
-﻿using Common.Helpers;
+﻿using System;
+using Common.Helpers;
 using Common.Managers;
 using Common.Utilities;
 using HarmonyLib;
@@ -142,7 +143,7 @@ public class ModEntry : Mod
     {
         int mod = (Config.ModKey!.IsDown() ? Config.ModSpeed : 1);
         Point shift = new(x * mod, y * mod);
-
+        throw new NullReferenceException();
         Furniture? selectedFurniture = GetSelectedFurniture();
 
         if (FurnitureToMove != null)
