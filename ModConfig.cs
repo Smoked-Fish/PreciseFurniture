@@ -4,7 +4,7 @@ using StardewModdingAPI;
 using StardewModdingAPI.Utilities;
 
 namespace PreciseFurniture;
-public sealed class Config : IConfigurable
+public sealed class ModConfig : IConfigurable
 {
     [DefaultValue(true)]
     public bool EnableMod { get; set; }
@@ -42,7 +42,7 @@ public sealed class Config : IConfigurable
     [DefaultValue(10)]
     public int MoveSpeed { get; set; }
 
-    public Config()
+    public ModConfig()
     {
         ConfigUtility.InitializeDefaultConfig(this);
     }

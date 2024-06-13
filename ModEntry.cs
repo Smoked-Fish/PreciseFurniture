@@ -19,7 +19,7 @@ public class ModEntry : Mod
     public static IModHelper ModHelper { get; private set; } = null!;
     public static IMonitor ModMonitor { get; private set; } = null!;
     public static IManifest Manifest { get; private set; } = null!;
-    public static Config Config { get; private set; } = null!;
+    public static ModConfig Config { get; private set; } = null!;
     public static Furniture? FurnitureToMove { get; private set; }
 
     private static int ticks;
@@ -31,7 +31,7 @@ public class ModEntry : Mod
         ModMonitor = Monitor;
         ModHelper = helper;
         Manifest = ModManifest;
-        Config = Helper.ReadConfig<Config>();
+        Config = Helper.ReadConfig<ModConfig>();
 
         ConfigManager.Init(ModManifest, Config, Helper, Monitor);
         PatchHelper.Init(new Harmony(ModManifest.UniqueID));
@@ -58,7 +58,7 @@ public class ModEntry : Mod
 
     private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)
     {
-        if (!Helper.ModRegistry.IsLoaded("spacechase0.GenericConfigMenu")) return;
+        if (!Helper.ModRegistry.IsLoaded("spacechase0.GenericModConfigMenu")) return;
 
         ConfigManager.AddOption(nameof(Config.EnableMod));
         ConfigManager.AddOption(nameof(Config.MoveCursor));
